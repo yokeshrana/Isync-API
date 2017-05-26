@@ -1,1 +1,1 @@
-web: gunicorn HmsApi.wsgi
+web: gunicorn IsyncWeb.wsgi
