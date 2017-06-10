@@ -1,7 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-
-
 from IsyncWeb import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -16,4 +14,5 @@ class Notes(models.Model):
     title=models.TextField(max_length=30)
     text=models.TextField(max_length=500)
     username=models.TextField(max_length=15)
+    date = models.DateTimeField(auto_now_add=True)
 

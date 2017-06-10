@@ -6,9 +6,9 @@ from rest_framework.authtoken.models import Token
 from django.shortcuts import render
 
 from api.models import Notes
-
+@csrf_exempt
 def Addnow(request):
-    res=request.GET
+    res=request.POST
     object=Notes.objects.all()
     try:
      t=object.create(text=res['text'],title=res['title'],username=res['username'])
@@ -22,14 +22,15 @@ def Addnow(request):
 
     return JsonResponse(h)
 
-
+@csrf_exempt
 def update(request):
-    res = request.GET
+    res = request.POST
     try:
         t = Notes.objects.get(pk=res['pk'])
-        t.title=res['title']
         t.text=res['text']
         t.username=res['username']
+        t.title = res['title']
+        t.save()
         h = {
             'update': 'true'
         }
@@ -40,11 +41,12 @@ def update(request):
 
     return JsonResponse(h)
 
-
+@csrf_exempt
 def delete(request):
-    res = request.GET
+    res = request.POST
     try:
-        t = Notes.objects.get(pk=res['pk']) #send pk for deletion
+        t=Notes.objects.filter(username=res['username'])
+        t = t.get(pk=res['pk']) #send pk for deletion
         t.delete()
         h = {
             'update': 'true'
@@ -77,19 +79,21 @@ def show(request):
     option = res['option']
     if check(username, token):
         if option == "short":
-            obj = Notes.objects.filter(username=username)
+            obj = Notes.objects.filter(username=username).order_by('-date')
             jsonarray = []
             for object in obj:
                 str = object.title.__str__()
                 pk=object.pk
+
                 jsonobj = {'title': str,
-                           'pk':pk}
+                           'pk':pk,
+                           'date': object.date.strftime('%d-%m-%Y'+" at " + '%H:%M:%S')}
                 jsonarray.append(jsonobj)
             print(jsonarray)
             return JsonResponse(jsonarray, safe=False)
 
         elif option == "full":
-            obj = Notes.objects.filter(username=username)
+            obj = Notes.objects.filter(username=username).order_by('date')
             jsonarray = []
             for object in obj:
                 str = object.title.__str__()
@@ -97,7 +101,8 @@ def show(request):
                 pk=object.pk
                 jsonobj = {'title': str,
                            'text': text,
-                           'pk':pk}
+                           'pk':pk,
+                                'date': object.date.strftime('%d-%m-%Y'+" at " + '%H:%M:%S')}
 
                 jsonarray.append(jsonobj)
             print(jsonarray)
@@ -113,16 +118,20 @@ def login(request):
     userobj = authenticate(username=u, password=p)
     p = {
         "login": "false",
-        "token": "null"
+        "token": "null",
+        "username": "null",
+
     }
     if userobj is not None:
         token = Token.objects.get(user__username=u).__str__()
         p['login'] = 'true'
         p['token'] = token
+        p['username'] = userobj.email
         return JsonResponse(p)
     else:
         p['login'] = 'false'
         p['token'] = 'null'
+        p['username'] ="null"
         return JsonResponse(p)
 @csrf_exempt
 def register(request):
@@ -157,3 +166,21 @@ def register(request):
         return JsonResponse(p)
     except:
         return JsonResponse(p)
+
+@csrf_exempt
+def showindividual(request,pk):
+
+    res = request.POST
+    username = res['username']
+    token = res['token']
+    jsonobj = {'text': "",
+               'title':""
+               }
+    if check(username,token):
+        obj = Notes.objects.get(pk=pk)
+
+        jsonobj = {'text': obj.text,
+                   'title':obj.title
+                }
+
+    return JsonResponse(jsonobj, safe=False)
