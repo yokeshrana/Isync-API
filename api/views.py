@@ -11,7 +11,7 @@ def index(request):
     html+="<br><hr><h1 style='text-align:center;color:#FFF'>ISYNC</h1><hr><br><br><br>"
     html+="<div style='font-size:2em; text-align:center;color:#FFF'>This is an Api For Isync Android APP </div>"
     html+="<br><br> <br><br><br><div  style='text-align:center;color:#FFF;font-size:2em;'> " \
-          "<a style='color:#FFF;text-decoration: none;' href='#' >Click Here To download the app</a> </div>"
+          "<a style='color:#FFF;text-decoration: none;' href='https://drive.google.com/file/d/0B5NESpCL3GJPUmNCdXFnTEdLQ2s/view?usp=drivesdk' >Click Here To download the app</a> </div>"
     html+="<br><br> <br><br><br><hr><br><div  style='position:relative; margin-bottom:20px;text-align:center;color:#FFF;font-size:2em;'> " \
           "DEVELOPED BY YOKESH RANA CSE BIET JHANSI </div><hr>"
     return HttpResponse(html)
